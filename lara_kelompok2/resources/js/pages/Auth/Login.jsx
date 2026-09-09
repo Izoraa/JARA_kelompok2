@@ -23,18 +23,30 @@ export default function Login() {
                     <input
                         type="email"
                         placeholder="Email"
-                        className="w-full border p-3 rounded mb-3"
+                        className="w-full border p-3 rounded mb-1"
                         value={data.email}
                         onChange={(e) => setData("email", e.target.value)}
                     />
 
+                    {errors.email && (
+                        <p className="text-red-500 text-sm mb-3">
+                            {errors.email}
+                        </p>
+                    )}
+
                     <input
                         type="password"
                         placeholder="Password"
-                        className="w-full border p-3 rounded mb-5"
+                        className="w-full border p-3 rounded mb-1"
                         value={data.password}
                         onChange={(e) => setData("password", e.target.value)}
                     />
+
+                    {errors.password && (
+                        <p className="text-red-500 text-sm mb-3">
+                            {errors.password}
+                        </p>
+                    )}
 
                     <button
                         disabled={processing}
