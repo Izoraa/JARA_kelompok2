@@ -4,37 +4,48 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Project extends Model
 {
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'name',
         'description',
-        'owner_id', // ID user pembuat/pemilik project
     ];
 
     /**
-     * Relasi ke User pemilik project
+     * Relasi ke User pemilik project (dari rekan Anda)
      */
-    public function owner()
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'owner_id');
+        return $this->belongsTo(User::class);
     }
 
     /**
-     * Relasi ke Anggota project (SRS-05)
+     * Relasi alias owner (agar kode Anda tetap cocok)
      */
-    public function members()
+    public function owner(): BelongsTo
+    {
+        return $this->user();
+    }
+
+    /**
+     * Relasi ke Anggota project (Fitur SRS-05 Anda)
+     */
+    public function members(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'project_user')->withTimestamps();
     }
 
     /**
-     * Relasi ke Tasks di dalam project ini
+     * Relasi ke Tasks
      */
-    public function tasks()
+    public function tasks(): HasMany
     {
         return $this->hasMany(Task::class);
     }

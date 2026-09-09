@@ -24,7 +24,7 @@ class ProjectMemberController extends Controller
         }
 
         // 2. Cek apakah sudah jadi anggota atau pemilik
-        if ($project->owner_id === $user->id || $project->members()->where('user_id', $user->id)->exists()) {
+        if ($project->user_id === $user->id || $project->members()->where('user_id', $user->id)->exists()) {
             return back()->withErrors(['username' => 'User sudah menjadi anggota / pemilik project']);
         }
 

@@ -11,16 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('project_user', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('project_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->timestamps();
-
-            // Mencegah user yang sama ditambahkan berulang kali ke project yang sama
-            $table->unique(['project_id', 'user_id']);
-        });
+        if (! Schema::hasTable('project_user')) {
+            Schema::create('project_user', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('project_id')->constrained()->cascadeOnDelete();
+                $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+                $table->timestamps();
+                $table->unique(['project_id', 'user_id']);
+            });
+        }
     }
+
 
     /**
      * Reverse the migrations.
