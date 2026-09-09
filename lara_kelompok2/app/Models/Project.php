@@ -19,7 +19,7 @@ class Project extends Model
     ];
 
     /**
-     * Relasi ke User pemilik project (dari rekan Anda)
+     * Relasi ke User pemilik project
      */
     public function user(): BelongsTo
     {
@@ -27,7 +27,7 @@ class Project extends Model
     }
 
     /**
-     * Relasi alias owner (agar kode Anda tetap cocok)
+     * Relasi alias owner (untuk kecocokan kode)
      */
     public function owner(): BelongsTo
     {
@@ -35,7 +35,7 @@ class Project extends Model
     }
 
     /**
-     * Relasi ke Anggota project (Fitur SRS-05 Anda)
+     * Relasi ke Anggota project (SRS-05)
      */
     public function members(): BelongsToMany
     {

@@ -9,7 +9,6 @@ use Inertia\Inertia;
 
 class ProjectController extends Controller
 {
-    // Dari rekan Anda (Daftar Project)
     public function index()
     {
         $projects = Project::where('user_id', auth()->id())
@@ -21,7 +20,6 @@ class ProjectController extends Controller
         ]);
     }
 
-    // Dari rekan Anda (Buat Project Baru)
     public function store(Request $request)
     {
         $request->validate([
@@ -38,7 +36,6 @@ class ProjectController extends Controller
         return redirect()->back();
     }
 
-    // Dari Anda (Detail Project & Anggota SRS-05)
     public function show(Project $project)
     {
         $project->load(['user', 'members']);
