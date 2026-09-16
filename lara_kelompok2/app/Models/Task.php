@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Task extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'project_id',
         'title',
@@ -13,6 +17,8 @@ class Task extends Model
         'priority',
         'deadline',
         'is_completed',
+        'assigned_to',
+        'status',
     ];
 
     protected $casts = [
@@ -20,14 +26,13 @@ class Task extends Model
         'is_completed' => 'boolean',
     ];
 
-    public function project()
+    public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
     }
 
-    public function users()
+    public function assignee(): BelongsTo
     {
-        return $this->belongsToMany(User::class)
-            ->withTimestamps();
+        return $this->belongsTo(User::class, 'assigned_to');
     }
 }

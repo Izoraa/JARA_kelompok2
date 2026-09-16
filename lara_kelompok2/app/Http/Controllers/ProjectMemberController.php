@@ -12,19 +12,8 @@ class ProjectMemberController extends Controller
 {
     public function store(AddProjectMemberRequest $request, Project $project)
     {
-<<<<<<< HEAD
         // 1. Validasi Otorisasi (SRS-SEC-01): Memastikan hanya pemilik/admin yang berwenang menambah anggota
         Gate::authorize('addMember', $project);
-=======
-        // Hanya Pemilik Daftar yang dapat menambahkan anggota tim (SRS-COL-01)
-        if ($project->user_id !== auth()->id()) {
-            abort(403, 'Hanya pemilik project yang dapat menambahkan anggota.');
-        }
-
-        $request->validate([
-            'username' => 'required|string',
-        ]);
->>>>>>> origin/KolaborasiTimDanPemantauan
 
         $validated = $request->validated();
         $username = $validated['username'];
