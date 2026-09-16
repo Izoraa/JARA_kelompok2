@@ -43,7 +43,7 @@ class ProjectController extends Controller
         // Validasi Otorisasi (SRS-SEC-01): Menolak akses jika pengguna tidak berwenang (HTTP 403 Forbidden)
         Gate::authorize('view', $project);
 
-        $project->load(['user', 'members']);
+        $project->load(['user', 'members', 'tasks.assignee']);
 
         return Inertia::render('Projects/Show', [
             'project' => $project,
