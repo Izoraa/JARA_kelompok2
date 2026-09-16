@@ -10,6 +10,11 @@ class ProjectMemberController extends Controller
 {
     public function store(Request $request, Project $project)
     {
+        // Hanya Pemilik Daftar yang dapat menambahkan anggota tim (SRS-COL-01)
+        if ($project->user_id !== auth()->id()) {
+            abort(403, 'Hanya pemilik project yang dapat menambahkan anggota.');
+        }
+
         $request->validate([
             'username' => 'required|string',
         ]);
