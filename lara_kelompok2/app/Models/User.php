@@ -4,7 +4,6 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Project;
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -42,7 +41,15 @@ class User extends Authenticatable
     }
 
     public function projects()
-{
-    return $this->hasMany(Project::class);
-}
+    {
+        return $this->belongsToMany(Project::class, 'project_members')
+            ->withPivot('role')
+            ->withTimestamps();
+    }
+
+
+    public function tasks()
+    {
+        return $this->belongsToMany(Task::class);
+    }
 }
