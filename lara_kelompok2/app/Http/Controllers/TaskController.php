@@ -23,7 +23,7 @@ class TaskController extends Controller
         $project->load(['user', 'members']);
 
         $tasks = $project->tasks()
-            ->with('users')
+            ->with('assignee')
             ->latest()
             ->get();
 
@@ -54,52 +54,86 @@ class TaskController extends Controller
         ]);
     }
 
-    // Menambah task
-    public function store(Request $request, Project $project)
+    // SRS-TSK-01: Buat Task Baru
+    public function store(Request $request)
     {
-        if ($project->user_id != auth()->id()) {
-            abort(403);
-        }
-
         $request->validate([
+            'project_id' => 'required|exists:projects,id',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'priority' => 'required|in:low,medium,high',
-            'deadline' => 'nullable|date',
+            'priority' => 'required|in:Low,Medium,High,low,medium,high',
+            'deadline' => 'nullable|date|after_or_equal:today',
         ]);
 
-        $project->tasks()->create([
+        Task::create([
+            'project_id' => $request->project_id,
             'title' => $request->title,
             'description' => $request->description,
-            'priority' => $request->priority,
+            'priority' => ucfirst(strtolower($request->priority)),
             'deadline' => $request->deadline,
+            'is_completed' => false,
+            'status' => 'Todo',
         ]);
 
-        return redirect()->back();
+        return back()->with('success', 'Task berhasil ditambahkan');
     }
 
-    // Mengubah task
+    // SRS-TSK-02: Update Priority, Deadline, Title, & Description
     public function update(Request $request, Task $task)
     {
-        if ($task->project->user_id != auth()->id()) {
-            abort(403);
-        }
-
         $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
-            'priority' => 'required|in:low,medium,high',
+            'priority' => 'required|in:Low,Medium,High,low,medium,high',
             'deadline' => 'nullable|date',
         ]);
 
         $task->update([
-            'title' => $request->title,
-            'description' => $request->description,
-            'priority' => $request->priority,
+            'title' => $request->title ?? $task->title,
+            'description' => $request->description ?? $task->description,
+            'priority' => ucfirst(strtolower($request->priority)),
             'deadline' => $request->deadline,
         ]);
 
-        return redirect()->back();
+        return back()->with('success', 'Task berhasil diperbarui');
+    }
+
+    // SRS-TSK-03: Toggle Status Selesai
+    public function toggleComplete(Task $task)
+    {
+        $task->update([
+            'is_completed' => !$task->is_completed,
+        ]);
+
+        return back()->with('success', 'Status tugas berhasil diubah');
+    }
+
+    // SRS-06A: Assign Task ke Anggota
+    public function assign(Request $request, Task $task)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        $task->update([
+            'assigned_to' => $request->user_id,
+        ]);
+
+        return back()->with('success', 'Task berhasil di-assign');
+    }
+
+    // SRS-06B: Ubah Status Task
+    public function updateStatus(Request $request, Task $task)
+    {
+        $request->validate([
+            'status' => 'required|in:Todo,In Progress,Done',
+        ]);
+
+        $task->update([
+            'status' => $request->status,
+        ]);
+
+        return back()->with('success', 'Status task berhasil diperbarui');
     }
 
     // Menghapus task
@@ -111,20 +145,6 @@ class TaskController extends Controller
 
         $task->delete();
 
-        return redirect()->back();
-    }
-
-    // Mengubah status selesai
-    public function complete(Task $task)
-    {
-        if ($task->project->user_id != auth()->id()) {
-            abort(403);
-        }
-
-        $task->update([
-            'is_completed' => !$task->is_completed,
-        ]);
-
-        return redirect()->back();
+        return back()->with('success', 'Task berhasil dihapus');
     }
 }

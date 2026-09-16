@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreProjectRequest;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class ProjectController extends Controller
@@ -40,17 +42,14 @@ class ProjectController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreProjectRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         Project::create([
             'user_id' => Auth::id(),
-            'name' => $request->name,
-            'description' => $request->description,
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
         ]);
 
         return redirect()->back();
@@ -58,18 +57,12 @@ class ProjectController extends Controller
 
     public function show(Project $project)
     {
-        $userId = Auth::id();
-        $isOwner = $project->user_id === $userId;
-        $isMember = $project->members()->where('user_id', $userId)->exists();
+        // Validasi Otorisasi (SRS-SEC-01): Menolak akses jika pengguna tidak berwenang (HTTP 403 Forbidden)
+        Gate::authorize('view', $project);
 
-        if (! $isOwner && ! $isMember) {
-            abort(403, 'Anda tidak memiliki akses ke project ini.');
-        }
+        $isOwner = $project->user_id === Auth::id();
 
-        $project->load([
-            'user',
-            'members',
-        ]);
+        $project->load(['user', 'members', 'tasks.assignee']);
 
         return Inertia::render('Projects/Show', [
             'project' => $project,

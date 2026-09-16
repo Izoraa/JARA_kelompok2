@@ -4,12 +4,13 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectMemberController;
+use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\CollaborationController;
 
 Route::inertia('/', 'welcome')->name('home');
 
-// === Rute Autentikasi (dari main) ===
+// === Rute Autentikasi ===
 Route::get('/register', function () {
     return inertia('Auth/Register');
 });
@@ -26,35 +27,30 @@ Route::get('/dashboard', function () {
     return inertia('Dashboard');
 })->middleware('auth');
 
-// === Rute Admin (SRS-07, SRS-08) ===
-Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/users', [\App\Http\Controllers\AdminUserController::class, 'index'])->name('users.index');
-    Route::post('/users', [\App\Http\Controllers\AdminUserController::class, 'store'])->name('users.store');
-    Route::delete('/users/{user}', [\App\Http\Controllers\AdminUserController::class, 'destroy'])->name('users.destroy');
-});
-
-// =========================
-// PROJECT & KOLABORASI (AUTH)
-// =========================
-Route::middleware('auth')->group(function () {
+// === Rute Fitur Project, Anggota, & Kolaborasi (SRS-05, SRS-SEC-01, SRS-COL-01) ===
+Route::middleware(['auth'])->group(function () {
     Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
     Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
-    Route::put('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
-    Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
-
-    // Anggota Project (SRS-COL-01)
     Route::post('/projects/{project}/members', [ProjectMemberController::class, 'store'])->name('projects.members.store');
 
-    // =========================
-    // TASK & KOLABORASI (SRS-COL-02, SRS-COL-03)
-    // =========================
+    // Halaman Papan Tugas & Progres Project (SRS-COL-03)
     Route::get('/projects/{project}/tasks', [TaskController::class, 'index'])->name('projects.tasks.index');
-    Route::post('/projects/{project}/tasks', [TaskController::class, 'store'])->name('projects.tasks.store');
-    Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
-    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
-    Route::patch('/tasks/{task}/complete', [TaskController::class, 'complete'])->name('tasks.complete');
+});
 
-    // Penugasan Anggota ke Task (SRS-COL-02)
-    Route::post('/tasks/{task}/assign', [CollaborationController::class, 'assignTask'])->name('tasks.assign');
+// === Rute Fitur Task (TSK-01, TSK-02, TSK-03, SRS-06) ===
+Route::middleware(['auth'])->group(function () {
+    Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
+    Route::patch('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+    Route::patch('/tasks/{task}/toggle-complete', [TaskController::class, 'toggleComplete'])->name('tasks.toggle-complete');
+    Route::patch('/tasks/{task}/assign', [TaskController::class, 'assign'])->name('tasks.assign');
+    Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.update-status');
+    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
+});
+
+// === Rute Admin (SRS-07, SRS-08, SRS-SEC-01) ===
+Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+    Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
+    Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
 });
