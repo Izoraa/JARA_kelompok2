@@ -38,28 +38,68 @@ export default function Show({ project }: { project: Project }) {
     };
 
     return (
-        <div style={{ maxWidth: '800px', margin: '40px auto', fontFamily: 'sans-serif', padding: '20px' }}>
+        <div
+            style={{
+                maxWidth: '800px',
+                margin: '40px auto',
+                fontFamily: 'sans-serif',
+                padding: '20px',
+            }}
+        >
             {/* Header Project */}
-            <div style={{ borderBottom: '1px solid #ddd', paddingBottom: '15px', marginBottom: '20px' }}>
+            <div
+                style={{
+                    borderBottom: '1px solid #ddd',
+                    paddingBottom: '15px',
+                    marginBottom: '20px',
+                }}
+            >
                 <h1 style={{ margin: '0 0 10px 0' }}>{project.name}</h1>
-                <p style={{ color: '#666', margin: 0 }}>{project.description}</p>
-                <p style={{ fontSize: '13px', color: '#888', marginTop: '5px' }}>
+                <p style={{ color: '#666', margin: 0 }}>
+                    {project.description}
+                </p>
+                <p
+                    style={{
+                        fontSize: '13px',
+                        color: '#888',
+                        marginTop: '5px',
+                    }}
+                >
                     Owner: <strong>{project.owner?.name}</strong>
                 </p>
             </div>
 
             {/* SRS-05: DAFTAR & FORM TAMBAH ANGGOTA */}
-            <div style={{ background: '#f9f9f9', padding: '20px', borderRadius: '8px', marginBottom: '30px' }}>
+            <div
+                style={{
+                    background: '#f9f9f9',
+                    padding: '20px',
+                    borderRadius: '8px',
+                    marginBottom: '30px',
+                }}
+            >
                 <h2 style={{ marginTop: 0 }}>👥 Anggota Project (SRS-05)</h2>
 
                 {/* Form Input Tambah Anggota */}
-                <form onSubmit={handleAddMember} style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+                <form
+                    onSubmit={handleAddMember}
+                    style={{
+                        display: 'flex',
+                        gap: '10px',
+                        marginBottom: '15px',
+                    }}
+                >
                     <input
                         type="text"
                         placeholder="Nama atau Email anggota..."
                         value={data.username}
                         onChange={(e) => setData('username', e.target.value)}
-                        style={{ flex: 1, padding: '8px 12px', borderRadius: '4px', border: '1px solid #ccc' }}
+                        style={{
+                            flex: 1,
+                            padding: '8px 12px',
+                            borderRadius: '4px',
+                            border: '1px solid #ccc',
+                        }}
                     />
                     <button
                         type="submit"
@@ -79,13 +119,25 @@ export default function Show({ project }: { project: Project }) {
 
                 {/* Pesan Error Validasi */}
                 {errors.username && (
-                    <div style={{ color: 'red', fontSize: '14px', marginBottom: '10px' }}>
+                    <div
+                        style={{
+                            color: 'red',
+                            fontSize: '14px',
+                            marginBottom: '10px',
+                        }}
+                    >
                         {errors.username}
                     </div>
                 )}
 
                 {/* List Anggota Terdaftar */}
-                <ul style={{ listStyleType: 'disc', paddingLeft: '20px', margin: 0 }}>
+                <ul
+                    style={{
+                        listStyleType: 'disc',
+                        paddingLeft: '20px',
+                        margin: 0,
+                    }}
+                >
                     {project.members && project.members.length > 0 ? (
                         project.members.map((member) => (
                             <li key={member.id} style={{ marginBottom: '5px' }}>
@@ -93,7 +145,9 @@ export default function Show({ project }: { project: Project }) {
                             </li>
                         ))
                     ) : (
-                        <p style={{ color: '#888', margin: 0 }}>Belum ada anggota di project ini.</p>
+                        <p style={{ color: '#888', margin: 0 }}>
+                            Belum ada anggota di project ini.
+                        </p>
                     )}
                 </ul>
             </div>

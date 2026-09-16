@@ -27,3 +27,10 @@ Route::get('/dashboard', function () {
 // === Rute Fitur Project & Anggota (SRS-05) ===
 Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
 Route::post('/projects/{project}/members', [ProjectMemberController::class, 'store'])->name('projects.members.store');
+
+// === Rute Admin (SRS-07, SRS-08) ===
+Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/users', [\App\Http\Controllers\AdminUserController::class, 'index'])->name('users.index');
+    Route::post('/users', [\App\Http\Controllers\AdminUserController::class, 'store'])->name('users.store');
+    Route::delete('/users/{user}', [\App\Http\Controllers\AdminUserController::class, 'destroy'])->name('users.destroy');
+});

@@ -1,21 +1,21 @@
-import { useForm } from "@inertiajs/react";
+import { useForm } from '@inertiajs/react';
 
 export default function Login() {
     const { data, setData, post, processing, errors } = useForm({
-        email: "",
-        password: "",
+        email: '',
+        password: '',
     });
 
     function submit(e) {
         e.preventDefault();
 
-        post("/login");
+        post('/login');
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="bg-white shadow-md rounded-xl p-8 w-96">
-                <h1 className="text-2xl font-bold text-center mb-6">
+        <div className="flex min-h-screen items-center justify-center bg-gray-100">
+            <div className="w-96 rounded-xl bg-white p-8 shadow-md">
+                <h1 className="mb-6 text-center text-2xl font-bold">
                     Login JARA
                 </h1>
 
@@ -23,13 +23,13 @@ export default function Login() {
                     <input
                         type="email"
                         placeholder="Email"
-                        className="w-full border p-3 rounded mb-1"
+                        className="mb-1 w-full rounded border p-3"
                         value={data.email}
-                        onChange={(e) => setData("email", e.target.value)}
+                        onChange={(e) => setData('email', e.target.value)}
                     />
 
                     {errors.email && (
-                        <p className="text-red-500 text-sm mb-3">
+                        <p className="mb-3 text-sm text-red-500">
                             {errors.email}
                         </p>
                     )}
@@ -37,20 +37,20 @@ export default function Login() {
                     <input
                         type="password"
                         placeholder="Password"
-                        className="w-full border p-3 rounded mb-1"
+                        className="mb-1 w-full rounded border p-3"
                         value={data.password}
-                        onChange={(e) => setData("password", e.target.value)}
+                        onChange={(e) => setData('password', e.target.value)}
                     />
 
                     {errors.password && (
-                        <p className="text-red-500 text-sm mb-3">
+                        <p className="mb-3 text-sm text-red-500">
                             {errors.password}
                         </p>
                     )}
 
                     <button
                         disabled={processing}
-                        className="w-full bg-blue-600 text-white py-3 rounded"
+                        className="w-full rounded bg-blue-600 py-3 text-white"
                     >
                         Login
                     </button>
