@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectMemberController;
+use App\Http\Controllers\TaskController;
 
 Route::inertia('/', 'welcome')->name('home');
 
@@ -28,9 +29,14 @@ Route::get('/dashboard', function () {
 Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
 Route::post('/projects/{project}/members', [ProjectMemberController::class, 'store'])->name('projects.members.store');
 
+// === Rute Fitur SRS-06 (Assign Task & Ubah Status) ===
+Route::patch('/tasks/{task}/assign', [TaskController::class, 'assign'])->name('tasks.assign');
+Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.update-status');
+
 // === Rute Admin (SRS-07, SRS-08) ===
 Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/users', [\App\Http\Controllers\AdminUserController::class, 'index'])->name('users.index');
     Route::post('/users', [\App\Http\Controllers\AdminUserController::class, 'store'])->name('users.store');
     Route::delete('/users/{user}', [\App\Http\Controllers\AdminUserController::class, 'destroy'])->name('users.destroy');
 });
+
