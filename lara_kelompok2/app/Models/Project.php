@@ -5,8 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Project extends Model
 {
@@ -37,15 +35,17 @@ class Project extends Model
     /**
      * Relasi ke Anggota project (SRS-05)
      */
-    public function members(): BelongsToMany
+    public function members()
     {
-        return $this->belongsToMany(User::class, 'project_user')->withTimestamps();
+        return $this->belongsToMany(User::class, 'project_members')
+            ->withPivot('role')
+            ->withTimestamps();
     }
 
     /**
      * Relasi ke Tasks
      */
-    public function tasks(): HasMany
+    public function tasks()
     {
         return $this->hasMany(Task::class);
     }

@@ -5,6 +5,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectMemberController;
 use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\TaskController;
+use App\Http\Controllers\CollaborationController;
 
 Route::inertia('/', 'welcome')->name('home');
 
@@ -16,7 +18,7 @@ Route::post('/register', [AuthController::class, 'register']);
 
 Route::get('/login', function () {
     return inertia('Auth/Login');
-});
+})->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::post('/logout', [AuthController::class, 'logout']);
@@ -25,12 +27,26 @@ Route::get('/dashboard', function () {
     return inertia('Dashboard');
 })->middleware('auth');
 
-// === Rute Fitur Project & Anggota (SRS-05, SRS-SEC-01) ===
+// === Rute Fitur Project, Anggota, & Kolaborasi (SRS-05, SRS-SEC-01, SRS-COL-01) ===
 Route::middleware(['auth'])->group(function () {
     Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
     Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
+    Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
     Route::post('/projects/{project}/members', [ProjectMemberController::class, 'store'])->name('projects.members.store');
+
+    // Halaman Papan Tugas & Progres Project (SRS-COL-03)
+    Route::get('/projects/{project}/tasks', [TaskController::class, 'index'])->name('projects.tasks.index');
+});
+
+// === Rute Fitur Task (TSK-01, TSK-02, TSK-03, SRS-06) ===
+Route::middleware(['auth'])->group(function () {
+    Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
+    Route::patch('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+    Route::patch('/tasks/{task}/toggle-complete', [TaskController::class, 'toggleComplete'])->name('tasks.toggle-complete');
+    Route::patch('/tasks/{task}/assign', [TaskController::class, 'assign'])->name('tasks.assign');
+    Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.update-status');
+    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
 });
 
 // === Rute Admin (SRS-07, SRS-08, SRS-SEC-01) ===
