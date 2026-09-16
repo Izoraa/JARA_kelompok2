@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreProjectRequest;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class ProjectController extends Controller
@@ -12,6 +14,9 @@ class ProjectController extends Controller
     public function index()
     {
         $projects = Project::where('user_id', auth()->id())
+            ->orWhereHas('members', function ($query) {
+                $query->where('users.id', auth()->id());
+            })
             ->latest()
             ->get();
 
@@ -20,17 +25,14 @@ class ProjectController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreProjectRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         Project::create([
             'user_id' => auth()->id(),
-            'name' => $request->name,
-            'description' => $request->description,
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
         ]);
 
         return redirect()->back();
@@ -38,11 +40,13 @@ class ProjectController extends Controller
 
     public function show(Project $project)
     {
+        // Validasi Otorisasi (SRS-SEC-01): Menolak akses jika pengguna tidak berwenang (HTTP 403 Forbidden)
+        Gate::authorize('view', $project);
+
         $project->load(['user', 'members', 'tasks.assignee']);
 
         return Inertia::render('Projects/Show', [
             'project' => $project,
         ]);
     }
-
 }
