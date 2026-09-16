@@ -63,24 +63,15 @@ export default function Index({ project, tasks }) {
     return (
         <div className="min-h-screen bg-gray-100 p-8">
             <div className="max-w-4xl mx-auto">
+                <h1 className="text-3xl font-bold">{project.name}</h1>
 
-                <h1 className="text-3xl font-bold">
-                    {project.name}
-                </h1>
-
-                <p className="text-gray-600 mb-6">
-                    {project.description}
-                </p>
+                <p className="text-gray-600 mb-6">{project.description}</p>
 
                 {/* FORM TAMBAH TASK */}
                 <div className="bg-white p-6 rounded-lg shadow mb-6">
-
-                    <h2 className="text-xl font-bold mb-4">
-                        Tambah Task
-                    </h2>
+                    <h2 className="text-xl font-bold mb-4">Tambah Task</h2>
 
                     <form onSubmit={tambahTask}>
-
                         <input
                             type="text"
                             placeholder="Nama task"
@@ -92,17 +83,13 @@ export default function Index({ project, tasks }) {
                         <textarea
                             placeholder="Deskripsi task"
                             value={description}
-                            onChange={(e) =>
-                                setDescription(e.target.value)
-                            }
+                            onChange={(e) => setDescription(e.target.value)}
                             className="w-full border p-2 rounded mb-3"
                         />
 
                         <select
                             value={priority}
-                            onChange={(e) =>
-                                setPriority(e.target.value)
-                            }
+                            onChange={(e) => setPriority(e.target.value)}
                             className="w-full border p-2 rounded mb-3"
                         >
                             <option value="low">Low</option>
@@ -113,9 +100,7 @@ export default function Index({ project, tasks }) {
                         <input
                             type="date"
                             value={deadline}
-                            onChange={(e) =>
-                                setDeadline(e.target.value)
-                            }
+                            onChange={(e) => setDeadline(e.target.value)}
                             className="w-full border p-2 rounded mb-3"
                         />
 
@@ -125,13 +110,11 @@ export default function Index({ project, tasks }) {
                         >
                             Tambah Task
                         </button>
-
                     </form>
                 </div>
 
                 {/* DAFTAR TASK */}
                 <div className="space-y-4">
-
                     {tasks.length === 0 && (
                         <div className="bg-white p-5 rounded-lg shadow">
                             Belum ada task.
@@ -139,17 +122,13 @@ export default function Index({ project, tasks }) {
                     )}
 
                     {tasks.map((task) => (
-
                         <div
                             key={task.id}
                             className="bg-white p-5 rounded-lg shadow"
                         >
-
                             {editId === task.id ? (
-
                                 // FORM EDIT
                                 <form onSubmit={simpanEdit}>
-
                                     <input
                                         type="text"
                                         value={editTitle}
@@ -162,9 +141,7 @@ export default function Index({ project, tasks }) {
                                     <textarea
                                         value={editDescription}
                                         onChange={(e) =>
-                                            setEditDescription(
-                                                e.target.value
-                                            )
+                                            setEditDescription(e.target.value)
                                         }
                                         className="w-full border p-2 rounded mb-3"
                                     />
@@ -172,32 +149,22 @@ export default function Index({ project, tasks }) {
                                     <select
                                         value={editPriority}
                                         onChange={(e) =>
-                                            setEditPriority(
-                                                e.target.value
-                                            )
+                                            setEditPriority(e.target.value)
                                         }
                                         className="w-full border p-2 rounded mb-3"
                                     >
-                                        <option value="low">
-                                            Low
-                                        </option>
+                                        <option value="low">Low</option>
 
-                                        <option value="medium">
-                                            Medium
-                                        </option>
+                                        <option value="medium">Medium</option>
 
-                                        <option value="high">
-                                            High
-                                        </option>
+                                        <option value="high">High</option>
                                     </select>
 
                                     <input
                                         type="date"
                                         value={editDeadline}
                                         onChange={(e) =>
-                                            setEditDeadline(
-                                                e.target.value
-                                            )
+                                            setEditDeadline(e.target.value)
                                         }
                                         className="w-full border p-2 rounded mb-3"
                                     />
@@ -216,11 +183,8 @@ export default function Index({ project, tasks }) {
                                     >
                                         Batal
                                     </button>
-
                                 </form>
-
                             ) : (
-
                                 // TAMPIL TASK
                                 <>
                                     <h2
@@ -238,14 +202,42 @@ export default function Index({ project, tasks }) {
                                     </p>
 
                                     <p className="mt-2">
-                                        Priority:{" "}
-                                        <b>{task.priority}</b>
+                                        Priority: <b>{task.priority}</b>
                                     </p>
 
-                                    <p>
-                                        Deadline:{" "}
-                                        {task.deadline || "-"}
-                                    </p>
+                                    <p>Deadline: {task.deadline || "-"}</p>
+
+                                    {/* MEMBER YANG MENGERJAKAN TASK */}
+                                    <div className="mt-4">
+                                        <p className="font-bold mb-2">
+                                            Dikerjakan oleh:
+                                        </p>
+
+                                        {task.users && task.users.length > 0 ? (
+                                            <div className="flex flex-wrap gap-2">
+                                                {task.users.map((user) => (
+                                                    <span
+                                                        key={user.id}
+                                                        className="
+                                bg-gray-200
+                                text-gray-700
+                                px-3
+                                py-1
+                                rounded-full
+                                text-sm
+                            "
+                                                    >
+                                                        {user.name}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <p className="text-gray-500 text-sm">
+                                                Belum ada anggota yang
+                                                ditugaskan
+                                            </p>
+                                        )}
+                                    </div>
 
                                     <p>
                                         Status:{" "}
@@ -255,11 +247,8 @@ export default function Index({ project, tasks }) {
                                     </p>
 
                                     <div className="mt-4 flex gap-2">
-
                                         <button
-                                            onClick={() =>
-                                                ubahStatus(task.id)
-                                            }
+                                            onClick={() => ubahStatus(task.id)}
                                             className="bg-green-500 text-white px-4 py-2 rounded"
                                         >
                                             {task.is_completed
@@ -268,33 +257,24 @@ export default function Index({ project, tasks }) {
                                         </button>
 
                                         <button
-                                            onClick={() =>
-                                                mulaiEdit(task)
-                                            }
+                                            onClick={() => mulaiEdit(task)}
                                             className="bg-yellow-500 text-white px-4 py-2 rounded"
                                         >
                                             Edit
                                         </button>
 
                                         <button
-                                            onClick={() =>
-                                                hapusTask(task.id)
-                                            }
+                                            onClick={() => hapusTask(task.id)}
                                             className="bg-red-500 text-white px-4 py-2 rounded"
                                         >
                                             Hapus
                                         </button>
-
                                     </div>
                                 </>
                             )}
-
                         </div>
-
                     ))}
-
                 </div>
-
             </div>
         </div>
     );
