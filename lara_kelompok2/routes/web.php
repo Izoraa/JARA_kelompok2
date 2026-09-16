@@ -23,7 +23,7 @@ Route::get('/login', function(){
 
     return inertia('Auth/Login');
 
-});
+})->name('login');
 
 
 Route::post('/login',[AuthController::class,'login']);

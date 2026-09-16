@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class ProjectController extends Controller
@@ -61,7 +62,9 @@ class ProjectController extends Controller
             abort(403);
         }
 
-        $project->delete();
+        DB::transaction(function () use ($project) {
+            $project->delete();
+        });
 
         return redirect()->back();
     }
