@@ -16,7 +16,7 @@ class IsAdmin
     public function handle(Request $request, Closure $next): Response
     {
         if (!auth()->check() || auth()->user()->role !== 'admin') {
-            return redirect()->route('home'); // Atau abort(403);
+            abort(403, 'Akses ditolak. Pengguna tidak memiliki hak akses admin.');
         }
 
         return $next($request);

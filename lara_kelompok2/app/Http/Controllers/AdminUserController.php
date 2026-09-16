@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreAdminUserRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
 
 class AdminUserController extends Controller
 {
@@ -17,14 +17,9 @@ class AdminUserController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreAdminUserRequest $request)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', Password::defaults()],
-            'role' => ['required', 'in:user,admin'],
-        ]);
+        $validated = $request->validated();
 
         User::create([
             'name' => $validated['name'],
@@ -38,6 +33,11 @@ class AdminUserController extends Controller
 
     public function destroy(User $user)
     {
+        // Validasi otorisasi admin (SRS-SEC-01)
+        if (!auth()->check() || auth()->user()->role !== 'admin') {
+            abort(403, 'Akses ditolak.');
+        }
+
         // Cegah admin menghapus dirinya sendiri
         if (auth()->id() === $user->id) {
             return redirect()->back()->with('error', 'You cannot delete your own account.');
