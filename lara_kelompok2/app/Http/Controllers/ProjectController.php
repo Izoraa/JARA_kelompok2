@@ -12,11 +12,12 @@ class ProjectController extends Controller
     public function index()
     {
         $projects = Project::where('user_id', auth()->id())
+            ->withCount('tasks')
             ->latest()
             ->get();
 
         return Inertia::render('Projects/Index', [
-            'projects' => $projects,
+            'projects' => $projects
         ]);
     }
 
