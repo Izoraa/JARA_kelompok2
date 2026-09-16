@@ -1,5 +1,5 @@
 import React from 'react';
-import { useForm, router } from '@inertiajs/react';
+import { useForm, router, Link } from '@inertiajs/react';
 
 interface User {
     id: number;
@@ -23,14 +23,23 @@ interface Project {
     id: number;
     name: string;
     description: string;
-    user: User;
+    user_id?: number;
+    user?: User;
     members: User[];
-    tasks: Task[];
+    tasks?: Task[];
 }
 
-export default function Show({ project }: { project: Project }) {
-    // Form SRS-05 (Tambah Anggota)
-    const memberForm = useForm({ username: '' });
+export default function Show({
+    project,
+    isOwner = true,
+}: {
+    project: Project;
+    isOwner?: boolean;
+}) {
+    // Form SRS-05 / SRS-COL-01 (Tambah Anggota)
+    const memberForm = useForm({
+        username: '',
+    });
 
     const handleAddMember = (e: React.FormEvent) => {
         e.preventDefault();
@@ -91,40 +100,84 @@ export default function Show({ project }: { project: Project }) {
         'Done': '#10b981',
     };
 
+    const projectOwner = project.user;
+
     return (
         <div style={{ maxWidth: '950px', margin: '40px auto', fontFamily: 'sans-serif', padding: '20px' }}>
+            {/* Navigasi Breadcrumb / Tombol Kembali */}
+            <div style={{ marginBottom: '15px', display: 'flex', gap: '10px' }}>
+                <Link
+                    href="/projects"
+                    style={{ color: '#0070f3', textDecoration: 'none', fontWeight: 500 }}
+                >
+                    &larr; Daftar Project
+                </Link>
+                <span style={{ color: '#ccc' }}>|</span>
+                <Link
+                    href={`/projects/${project.id}/tasks`}
+                    style={{ color: '#0070f3', textDecoration: 'none', fontWeight: 500 }}
+                >
+                    Lihat Papan & Progres &rarr;
+                </Link>
+            </div>
+
             {/* Header Project */}
             <div style={{ borderBottom: '1px solid #ddd', paddingBottom: '15px', marginBottom: '20px' }}>
                 <h1 style={{ margin: '0 0 10px 0' }}>{project.name}</h1>
-                <p style={{ color: '#666', margin: 0 }}>{project.description}</p>
-                <p style={{ fontSize: '13px', color: '#888', marginTop: '5px' }}>
-                    Owner: <strong>{project.user?.name}</strong>
+                <p style={{ color: '#666', margin: 0 }}>{project.description || 'Tidak ada deskripsi.'}</p>
+                <p style={{ fontSize: '13px', color: '#888', marginTop: '8px' }}>
+                    Pemilik Daftar (Owner): <strong>{projectOwner?.name || 'Owner'}</strong> ({projectOwner?.email})
                 </p>
             </div>
 
-            {/* ========== SRS-05: ANGGOTA ========== */}
-            <div style={{ background: '#f9f9f9', padding: '20px', borderRadius: '8px', marginBottom: '30px' }}>
-                <h2 style={{ marginTop: 0 }}>👥 Anggota Project (SRS-05)</h2>
-                <form onSubmit={handleAddMember} style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-                    <input
-                        type="text"
-                        placeholder="Nama atau Email anggota..."
-                        value={memberForm.data.username}
-                        onChange={(e) => memberForm.setData('username', e.target.value)}
-                        style={{ flex: 1, padding: '8px 12px', borderRadius: '4px', border: '1px solid #ccc' }}
-                    />
-                    <button type="submit" disabled={memberForm.processing}
-                        style={{ padding: '8px 16px', background: '#0070f3', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                        {memberForm.processing ? 'Menambahkan...' : 'Tambah Anggota'}
-                    </button>
-                </form>
-                {memberForm.errors.username && (
-                    <div style={{ color: 'red', fontSize: '14px', marginBottom: '10px' }}>{memberForm.errors.username}</div>
+            {/* ========== SRS-05 & SRS-COL-01: ANGGOTA ========== */}
+            <div style={{ background: '#f9f9f9', padding: '20px', borderRadius: '8px', marginBottom: '30px', border: '1px solid #e5e7eb' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                    <h2 style={{ margin: 0 }}>👥 Anggota Project</h2>
+                    <span style={{ fontSize: '13px', background: '#dbeafe', color: '#1e40af', padding: '2px 10px', borderRadius: '12px' }}>
+                        {project.members?.length || 0} Anggota
+                    </span>
+                </div>
+
+                {memberForm.wasSuccessful && (
+                    <div style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', color: '#065f46', padding: '10px', borderRadius: '4px', marginBottom: '15px', fontSize: '14px' }}>
+                        Anggota berhasil ditambahkan!
+                    </div>
                 )}
+
+                {isOwner ? (
+                    <form onSubmit={handleAddMember} style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+                        <input
+                            type="text"
+                            placeholder="Ketik username atau email anggota..."
+                            value={memberForm.data.username}
+                            onChange={(e) => memberForm.setData('username', e.target.value)}
+                            style={{ flex: 1, padding: '8px 12px', borderRadius: '4px', border: '1px solid #ccc' }}
+                        />
+                        <button
+                            type="submit"
+                            disabled={memberForm.processing}
+                            style={{ padding: '8px 16px', background: '#0070f3', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                        >
+                            {memberForm.processing ? 'Menambahkan...' : 'Tambah Anggota'}
+                        </button>
+                    </form>
+                ) : (
+                    <p style={{ color: '#854d0e', background: '#fef9c3', padding: '8px 12px', borderRadius: '4px', fontSize: '13px', margin: '0 0 15px 0' }}>
+                        Hanya <strong>Pemilik Daftar</strong> yang berhak menambahkan anggota baru.
+                    </p>
+                )}
+
+                {memberForm.errors.username && (
+                    <div style={{ color: '#dc2626', fontSize: '13px', marginBottom: '10px' }}>{memberForm.errors.username}</div>
+                )}
+
                 <ul style={{ listStyleType: 'disc', paddingLeft: '20px', margin: 0 }}>
                     {project.members && project.members.length > 0 ? (
                         project.members.map((m) => (
-                            <li key={m.id} style={{ marginBottom: '5px' }}><strong>{m.name}</strong> ({m.email})</li>
+                            <li key={m.id} style={{ marginBottom: '6px' }}>
+                                <strong>{m.name}</strong> <span style={{ color: '#666' }}>({m.email})</span>
+                            </li>
                         ))
                     ) : (
                         <p style={{ color: '#888', margin: 0 }}>Belum ada anggota.</p>
@@ -168,8 +221,11 @@ export default function Show({ project }: { project: Project }) {
                             onChange={(e) => taskForm.setData('description', e.target.value)}
                             style={{ flex: 1, padding: '8px 12px', borderRadius: '4px', border: '1px solid #ccc' }}
                         />
-                        <button type="submit" disabled={taskForm.processing}
-                            style={{ padding: '8px 20px', background: '#ea580c', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+                        <button
+                            type="submit"
+                            disabled={taskForm.processing}
+                            style={{ padding: '8px 20px', background: '#ea580c', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+                        >
                             {taskForm.processing ? 'Menyimpan...' : 'Tambah Task'}
                         </button>
                     </div>
@@ -179,7 +235,7 @@ export default function Show({ project }: { project: Project }) {
             </div>
 
             {/* ========== DAFTAR TASK (SRS-06 + TSK-02 + TSK-03) ========== */}
-            <div style={{ background: '#f0f4ff', padding: '20px', borderRadius: '8px' }}>
+            <div style={{ background: '#f0f4ff', padding: '20px', borderRadius: '8px', border: '1px solid #dbeafe' }}>
                 <h2 style={{ marginTop: 0 }}>📌 Daftar Task</h2>
 
                 {project.tasks && project.tasks.length > 0 ? (
@@ -196,11 +252,14 @@ export default function Show({ project }: { project: Project }) {
                         </thead>
                         <tbody>
                             {project.tasks.map((task) => (
-                                <tr key={task.id} style={{
-                                    borderBottom: '1px solid #e5e7eb',
-                                    opacity: task.is_completed ? 0.6 : 1,
-                                    backgroundColor: task.is_completed ? '#f0fdf4' : 'transparent',
-                                }}>
+                                <tr
+                                    key={task.id}
+                                    style={{
+                                        borderBottom: '1px solid #e5e7eb',
+                                        opacity: task.is_completed ? 0.6 : 1,
+                                        backgroundColor: task.is_completed ? '#f0fdf4' : 'transparent',
+                                    }}
+                                >
                                     {/* TSK-03: Checkbox Selesai */}
                                     <td style={{ padding: '10px 8px', textAlign: 'center' }}>
                                         <input
@@ -227,9 +286,13 @@ export default function Show({ project }: { project: Project }) {
                                             value={task.priority}
                                             onChange={(e) => handleUpdateTask(task.id, e.target.value, task.deadline)}
                                             style={{
-                                                padding: '4px 8px', borderRadius: '4px', border: '1px solid #ccc',
+                                                padding: '4px 8px',
+                                                borderRadius: '4px',
+                                                border: '1px solid #ccc',
                                                 backgroundColor: priorityColors[task.priority] || '#fff',
-                                                color: '#fff', fontWeight: 'bold', fontSize: '12px',
+                                                color: '#fff',
+                                                fontWeight: 'bold',
+                                                fontSize: '12px',
                                             }}
                                         >
                                             <option value="Low" style={{ background: '#fff', color: '#000' }}>Low</option>
@@ -256,7 +319,7 @@ export default function Show({ project }: { project: Project }) {
                                             style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid #ccc', width: '100%', fontSize: '12px' }}
                                         >
                                             <option value="">-- Belum --</option>
-                                            {project.members.map((member) => (
+                                            {project.members?.map((member) => (
                                                 <option key={member.id} value={member.id}>{member.name}</option>
                                             ))}
                                         </select>
@@ -268,9 +331,13 @@ export default function Show({ project }: { project: Project }) {
                                             value={task.status}
                                             onChange={(e) => handleStatusChange(task.id, e.target.value)}
                                             style={{
-                                                padding: '4px 8px', borderRadius: '4px', border: '1px solid #ccc',
+                                                padding: '4px 8px',
+                                                borderRadius: '4px',
+                                                border: '1px solid #ccc',
                                                 backgroundColor: statusColors[task.status] || '#fff',
-                                                color: '#fff', fontWeight: 'bold', fontSize: '12px',
+                                                color: '#fff',
+                                                fontWeight: 'bold',
+                                                fontSize: '12px',
                                             }}
                                         >
                                             <option value="Todo" style={{ background: '#fff', color: '#000' }}>Todo</option>

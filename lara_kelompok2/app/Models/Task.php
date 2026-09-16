@@ -21,6 +21,11 @@ class Task extends Model
         'status',
     ];
 
+    protected $casts = [
+        'deadline' => 'date',
+        'is_completed' => 'boolean',
+    ];
+
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);

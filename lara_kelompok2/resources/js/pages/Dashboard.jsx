@@ -10,16 +10,23 @@ export default function Dashboard() {
                 <h1 className="mb-4 text-3xl font-bold">Dashboard JARA</h1>
                 <p className="mb-6">Selamat datang, {user.name}!</p>
 
-                {user.role === 'admin' && (
-                    <div className="mb-6">
+                <div className="flex flex-col gap-3 mb-6">
+                    <Link
+                        href="/projects"
+                        className="rounded bg-indigo-600 px-5 py-2 text-white font-medium transition hover:bg-indigo-700"
+                    >
+                        📁 Daftar Project & Kolaborasi Tim
+                    </Link>
+
+                    {user.role === 'admin' && (
                         <Link
                             href="/admin/users"
                             className="rounded bg-blue-500 px-5 py-2 text-white transition hover:bg-blue-600"
                         >
                             Manajemen Pengguna (Admin)
                         </Link>
-                    </div>
-                )}
+                    )}
+                </div>
 
                 <button
                     onClick={() => router.post('/logout')}
@@ -27,6 +34,7 @@ export default function Dashboard() {
                 >
                     Logout
                 </button>
+
             </div>
         </div>
     );
